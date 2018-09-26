@@ -8,9 +8,5 @@ public class Test {
         if(yearToIncome.get("2010") == null) {
             System.out.println("oops");
         }
-
     }
-
-
-
 }
