@@ -76,5 +76,4 @@ fabric.properties
 .gradle
 build
 
-## neo4j
 neo4j
