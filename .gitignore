@@ -1,7 +1,5 @@
 # Created by https://www.gitignore.io/api/intellij
 
-.DS_Store
-
 ### Scala ###
 *.class
 *.log
@@ -76,4 +74,5 @@ fabric.properties
 .gradle
 build
 
+## neo4j
 neo4j
