@@ -1,4 +1,4 @@
-def neo4jVersion = "2.3.1"
+def neo4jVersion = "2.3.12"
 def junitVersion = "4.8.2"
 apply plugin: 'java'
 
@@ -13,8 +13,13 @@ dependencies {
    compile "org.neo4j:neo4j:${neo4jVersion}"
    compile "org.neo4j:neo4j-kernel:${neo4jVersion}"
    compile group: 'org.neo4j', name: 'neo4j-kernel', version: '${neo4jVersion}', classifier:'tests'
+   compile group: 'org.neo4j', name: 'neo4j-io', version: '${neo4jVersion}', classifier:'tests'
    compile "junit:junit:${junitVersion}"
 
+}
+
+test {
+    useJUnitPlatform()
 }
 
 task copyDeps(type: Copy) {
