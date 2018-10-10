@@ -8,6 +8,7 @@ import org.neo4j.cypher.ExecutionEngine;
 import org.neo4j.cypher.ExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 //import org.neo4j.kernel.logging.BufferingLogger;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.graphdb.Result;
 
@@ -19,14 +20,26 @@ import com.sun.tools.javac.api.JavacTaskImpl;
 
 
 public class Driver {
+
+
     private static GraphDatabaseService graphDb;
 
     public static void main(String args[]) throws Exception {
-        graphDb = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().newGraphDatabase();
+        graphDb = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(GraphDatabaseSettings.node_keys_indexable, "nodeType").
+                setConfig(GraphDatabaseSettings.relationship_keys_indexable, "typeKind").
+                setConfig(GraphDatabaseSettings.node_auto_indexing, "true").
+                setConfig(GraphDatabaseSettings.relationship_auto_indexing, "true").newGraphDatabase();
 
-		String src = "class A{\n"
+
+		String src = "import java.util.Collection;\n" +
+                "class A{\n"
 				   + "static class B extends A{}\n"
-				   + "static class C extends B{}\n"
+				   + "static class C extends B{" +
+                "void printCollection(Collection<?> c) {\n" +
+                "    for (Object e : c) {\n" +
+                "        System.out.println(e);\n" +
+                "    }\n" +
+                "}}\n"
 				   + "}";
 
 		JavacTaskImpl task = TestUtils.getTask(src);
@@ -42,7 +55,7 @@ public class Driver {
 //		ExecutionEngine engine = new ExecutionEngine(graphDb, new BufferingLogger());
 
 
-        Result result = graphDb.execute("start n=node(*) MATCH m-[r]->n RETURN m,r,n");
+        Result result = graphDb.execute("START n=node:node_auto_index(nodeType ='JCWildcard') RETURN n.typeBoundKind , count (*);");
 //		ExecutionResult result = engine.execute("start n=node(*) MATCH m-[r]->n RETURN m,r,n");
 		System.out.println(result.resultAsString());
 
