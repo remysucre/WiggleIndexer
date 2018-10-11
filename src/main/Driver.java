@@ -51,30 +51,48 @@ public class Driver {
 				 "WHERE NOT(n.name = '<init>') AND overloadedCount > 1 " +
 				 "RETURN method, overloadedCount;" ;
 
+		String all = "START n=node(*) MATCH (n)-[r]->(m) RETURN n,r,m;";
+
+        String qr_hunvar = "START n=node:node_auto_index(nodeType='JCIdent') " +
+				"WHERE n.typeKind='DECLARED' AND has(n.actualType) AND n.name =~ '[a-z].*'" +
+				"SET n.name = n.name + head(split(last(split(n.actualType, '.')), '<')) " +
+				"RETURN n.name, n.actualType, n.lineNumber\n";
+
+        String qr_hundecl = "START n=node:node_auto_index(nodeType='JCVariableDecl') " +
+				"WHERE n.typeKind='DECLARED' AND has(n.actualType) AND n.name =~ '[a-z].*'" +
+				"SET n.name = n.name + head(split(last(split(n.actualType, '.')), '<')) " +
+				"RETURN n.name, n.actualType, n.lineNumber;";
+
+		String arrs = "START n=node:node_auto_index(nodeType='JCIdent')" +
+				"WHERE n.name='myNumber'" +
+				"RETURN n;";
+
+        String qr_hungarian = qr_hunvar + " UNION ALL \n " + qr_hundecl;
+
 		String src = "import java.util.Collection;\n" +
 				"import java.util.ArrayList;\n" +
-				"class D extends java.lang.Exception {}" +
-				"class E extends D {" +
-				"void thing(){" +
+				"class D extends java.lang.Exception {}\n" +
+				"class E extends D {\n" +
+				"void thing(){\n" +
 				"Integer[] myInts = {1,2,3,4};\n" +
 				"Number[] myNumber = null;\n" +
-				"myNumber = myInts;" +
-				"myNumber = myInts;" +
-				"Integer x = 1;" +
-				"x = 2;" +
-				"}" +
-				"}" +
+				"myNumber = myInts;\n" +
+				"myNumber = myInts;\n" +
+				"Integer x = 1;\n" +
+				"x = 2;\n" +
+				"}\n" +
+				"}\n" +
                 "class A{\n"
 				   + "static class B extends A{}\n"
-				   + "static class C extends B{" +
-				"void pa() {}" +
+				   + "static class C extends B{\n" +
+				"void pa() {}\n" +
 				"void pa(Collection<?> c) {\n" +
-				"	pa(c);" +
+				"	pa(c);\n" +
 				"    for (Object e : c) {\n" +
 				"        System.out.println(e);\n" +
 				"    }}\n" +
 				"void print(Collection<?> c) {\n" +
-				"	print(c);" +
+				"	print(c);\n" +
 				"    for (Object e : c) {\n" +
 				"        System.out.println(e);\n" +
 				"    }}\n" +
@@ -83,7 +101,7 @@ public class Driver {
                 "        System.out.println(e);\n" +
                 "    }\n" +
                 "}}\n"
-				   + "}";
+				   + "}\n";
 
 		JavacTaskImpl task = TestUtils.getTask(src);
 
@@ -98,7 +116,7 @@ public class Driver {
 //		ExecutionEngine engine = new ExecutionEngine(graphDb, new BufferingLogger());
 
 
-        Result result = graphDb.execute(qr_fetchOverloaded);
+        Result result = graphDb.execute(arrs);
 //		ExecutionResult result = engine.execute("start n=node(*) MATCH m-[r]->n RETURN m,r,n");
 		System.out.println(result.resultAsString());
 
