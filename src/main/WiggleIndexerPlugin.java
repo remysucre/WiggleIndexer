@@ -16,7 +16,6 @@ import com.sun.source.util.JavacTask;
 
 
 public class WiggleIndexerPlugin implements com.sun.source.util.Plugin {
-
     private static final String PLUGIN_NAME = "WiggleIndexerPlugin";
     private GraphDatabaseBuilder graphDbBuilder;
 
